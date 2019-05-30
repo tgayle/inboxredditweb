@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
 import Welcome from './pages/Welcome.vue';
 import AuthenticateUser from './pages/AuthenticateUser.vue';
 
@@ -19,6 +18,11 @@ export default new Router({
       path: '/auth/reddit',
       name: 'authuser',
       component: AuthenticateUser,
+    },
+    {
+      path: '/app',
+      name: 'app',
+      component: () => import('./pages/MessagingApp.vue'),
     },
     {
       path: '/about',
