@@ -23,7 +23,13 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@types/babel-core": "^6.25.6",
+    "@types/core-js": "^2.5.0",
     "@types/jest": "^23.1.4",
+    "@types/lokijs": "^1.5.2",
+    "@types/node-sass": "^4.11.0",
+    "@types/querystringify": "^2.0.0",
+    "@types/snoowrap": "^1.15.3",
     "@vue/cli-plugin-babel": "^3.0.0",
     "@vue/cli-plugin-typescript": "^3.0.0",
     "@vue/cli-plugin-unit-jest": "^3.0.0",
