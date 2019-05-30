@@ -43,7 +43,7 @@ import Vue from 'vue';
 import { mapState } from 'vuex';
 export default Vue.extend({
   computed: {
-    ...mapState(['redditAuthUrl']),
+    ...mapState('auth', ['redditAuthUrl']),
   },
 });
 </script>

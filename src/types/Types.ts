@@ -47,3 +47,9 @@ export interface ClientUser {
   name: string;
   id: string;
 }
+
+export interface TokenRetrievalResponse {
+  error?: string;
+  code: string;
+  state: string;
+}

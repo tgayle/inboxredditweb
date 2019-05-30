@@ -1,26 +1,16 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import snoowrap from 'snoowrap';
+
+import authModule from './store/auth';
+import appModule from './store/app';
 
 Vue.use(Vuex);
 
-export interface RootState {
-  redditAuthUrl: string;
-}
+export interface RootState {}
 
 export default new Vuex.Store<RootState>({
-  state: {
-    redditAuthUrl: snoowrap.getAuthUrl({
-      clientId: process.env.VUE_APP_CLIENTID as string,
-      redirectUri: process.env.VUE_APP_REDIRECT as string,
-      permanent: true,
-      scope: ['identity', 'privatemessages', 'read', 'report'],
-    }),
-  },
-  mutations: {
-
-  },
-  actions: {
-
+  modules: {
+    auth: authModule,
+    app: appModule,
   },
 });
