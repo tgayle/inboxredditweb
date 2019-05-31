@@ -1,13 +1,13 @@
 <template>
   <v-container fluid fill-height class="pa-0">
     <v-layout row>
-      <v-flex xs2>
+      <v-flex xs2 lg1>
       <sidebar />
       </v-flex>
       <v-divider vertical/>
 
-      <v-flex xs3>
-      <recent-conversations />
+      <v-flex xs3 lg2 fill-height>
+      <recent-conversations class="prevent--overflow--scroll"/>
       </v-flex>
       <v-divider vertical/>
 
@@ -36,4 +36,9 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+  .prevent--overflow--scroll {
+    // height: 100%;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
 </style>
