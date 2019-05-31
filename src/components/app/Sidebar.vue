@@ -4,7 +4,8 @@
       <v-list-tile
         v-for="item in options"
         :key="item.title"
-        @click="">
+        :to="{name: 'messageswhere', params: {where: item.title.toLowerCase()}}"
+        @click="() => {}">
 
         <v-icon class="mr-2">{{ item.icon }}</v-icon>
 

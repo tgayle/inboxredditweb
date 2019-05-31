@@ -5,14 +5,17 @@
       <sidebar />
       </v-flex>
       <v-divider vertical/>
+
       <v-flex xs3>
       <recent-conversations />
       </v-flex>
       <v-divider vertical/>
+
       <v-flex>
-      <conversation-view />
+      <router-view name="masterView"></router-view>
       </v-flex>
       <v-divider vertical/>
+
     </v-layout>
   </v-container>
 </template>
