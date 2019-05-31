@@ -1,8 +1,8 @@
 <template>
-  <v-container fluid fill-height class="pa-0">
+  <v-container fluid fill-height class="pa-0 prevent--overflow--scroll">
     <v-layout row>
       <v-flex xs2 lg1>
-      <sidebar />
+      <sidebar class="prevent--overflow--scroll"/>
       </v-flex>
       <v-divider vertical/>
 
@@ -12,7 +12,7 @@
       <v-divider vertical/>
 
       <v-flex>
-      <router-view name="masterView"></router-view>
+      <router-view name="masterView" class="prevent--overflow--scroll"></router-view>
       </v-flex>
       <v-divider vertical/>
 
@@ -37,8 +37,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
   .prevent--overflow--scroll {
-    // height: 100%;
-    max-height: calc(100vh - 64px);
+    max-height: calc(100vh - 64px); // Factor out toolbar height. TODO: Adjust for differnet platforms.
     overflow-y: auto;
   }
 </style>
