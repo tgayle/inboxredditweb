@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Welcome from './pages/Welcome.vue';
-import AuthenticateUser from './pages/AuthenticateUser.vue';
+import Welcome from '../pages/Welcome.vue';
+import AuthenticateUser from '../pages/AuthenticateUser.vue';
+
+import appRoutes from './app';
 
 Vue.use(Router);
 
@@ -22,7 +24,8 @@ export default new Router({
     {
       path: '/app',
       name: 'app',
-      component: () => import('./pages/MessagingApp.vue'),
+      component: () => import('../pages/MessagingApp.vue'),
+      children: appRoutes,
     },
     {
       path: '/about',
@@ -30,7 +33,7 @@ export default new Router({
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
+      component: () => import(/* webpackChunkName: "about" */ '../views/About.vue'),
     },
   ],
 });
