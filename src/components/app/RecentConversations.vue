@@ -6,7 +6,9 @@
       :to="{name: 'viewconversation', params: {conversation: i, where: $route.params.where}}"
       @click="() => {}">
         <v-list-tile-content>
-          <v-list-tile-title>{{`Subject ${i}`}}</v-list-tile-title>
+          <v-list-tile-title>{{`Subject ${i}`}}
+            <v-icon class="pl-5">{{i % 2 == 0 ? 'call_made' : 'call_received'}}</v-icon>
+          </v-list-tile-title>
           <v-list-tile-sub-title>{{`Conversation message ${i}`}}</v-list-tile-sub-title>
         </v-list-tile-content>
     </v-list-tile>
