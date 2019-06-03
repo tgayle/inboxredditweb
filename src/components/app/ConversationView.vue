@@ -11,19 +11,22 @@
       </v-btn>
     </v-toolbar>
 
-    <template
+    <v-card
       v-for="i in 30"
-      @click="() => {}">
-      <div
-        :key="i">
-        <v-card>
-          <v-card-text class="mb-0 pb-0">{{i % 2 == 0 ? `/u/${correspondent}` : '/u/you'}}</v-card-text>
-          <v-card-text class="mb-0 pt-0 pb-1">Jan 1, 1970</v-card-text>
-          <v-card-text class="mb-0 pt-0 pb-1">{{lorem}}</v-card-text>
-        </v-card>
-        <v-divider />
-      </div>
-    </template>
+      :key="i"
+      class="mb-2">
+      <v-card-title>
+        <div>
+          <div>
+            <h2 class="mb-0 d-inline">/u/{{i % 2 === 0 ? 'you' : correspondent}}</h2>
+            <div class="text-xs-right d-inline">
+              <v-btn flat color="orange"><v-icon>reply</v-icon></v-btn>
+            </div>            
+          </div>
+          <div> {{ lorem }} </div>
+        </div>
+      </v-card-title>
+    </v-card>
   </div>
 </template>
 
