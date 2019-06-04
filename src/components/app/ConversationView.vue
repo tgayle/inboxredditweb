@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="conversation-view-parent">
     <v-toolbar flat>
       <v-toolbar-title class="headline">
         <span>Subject {{$route.params.conversation}}</span>
@@ -14,7 +14,7 @@
     <v-card
       v-for="i in 30"
       :key="i"
-      class="mb-2">
+      class="mb-2 conversation-message">
       <v-card-title>
         <div>
           <div>
@@ -44,6 +44,17 @@ export default Vue.extend({
       }
       return str;
     },
+  },
+
+  mounted() {
+    /* TODO: This doesn't scroll to the bottom if you open a conversation, scroll up so the last
+     message is no longer visible, then switch to another conversation. */
+    this.$vuetify.goTo('.conversation-message:last-of-type', {
+      easing: 'easeInOutCubic',
+      container: '.conversation-view-parent',
+      offset: 500,
+      duration: 500,
+    });
   },
 });
 </script>

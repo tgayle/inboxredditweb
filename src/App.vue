@@ -1,6 +1,6 @@
 <template>
   <div class="app">
-    <v-app dark>
+    <v-app>
       <v-toolbar app>
         <v-toolbar-title class="headline">
           <span>Inbox</span>
