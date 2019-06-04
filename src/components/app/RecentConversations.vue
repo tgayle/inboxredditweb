@@ -6,8 +6,15 @@
       :to="{name: 'viewconversation', params: {conversation: convo.firstMessageName, where: $route.params.where}}"
       @click="$emit('conversation-click', convo.firstMessageName, $event)">
         <v-list-tile-content>
-          <v-list-tile-title>{{`Subject ${convo.firstMessageName}`}}
-            <v-icon class="pl-5">{{wasMe(convo) ? 'call_made' : 'call_received'}}</v-icon>
+          <v-list-tile-title>
+            <v-layout>
+              <v-flex xs11 align-self-center>
+                {{`Subject ${convo.firstMessageName}`}}
+              </v-flex>
+              <v-flex align-self-center>
+                <v-icon class="pl-5">{{wasMe(convo) ? 'call_made' : 'call_received'}}</v-icon> 
+              </v-flex>
+            </v-layout>
           </v-list-tile-title>
           <v-list-tile-sub-title>{{`Conversation message, correspondent ${correspondent(convo)}`}}</v-list-tile-sub-title>
         </v-list-tile-content>

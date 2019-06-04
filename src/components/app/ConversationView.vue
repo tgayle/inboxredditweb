@@ -21,7 +21,7 @@
               <h2 class="mb-0">/u/{{correspondent(message)}}</h2>
             </v-flex>
             <v-flex align-self-center>
-              <v-btn flat color="orange" title="Reply"><v-icon>reply</v-icon></v-btn>  
+              <v-btn flat title="Reply"><v-icon>reply</v-icon></v-btn>  
             </v-flex>           
           </v-layout>
       </v-card-title>
