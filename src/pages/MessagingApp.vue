@@ -9,7 +9,7 @@
       <v-flex xs3 lg2 fill-height>
       <recent-conversations 
         class="prevent--overflow--scroll"
-        :conversations="conversations"
+        :conversations="conversationPreviews"
         @conversation-click="conversationClicked"/>
       </v-flex>
       <v-divider vertical/>
@@ -37,6 +37,8 @@ import NoConversation from '../components/app/NoConversation.vue';
 import { LocalMessage } from '../types/Types';
 
 import {generateConversations, filterToNewestMessageOfConversation} from '@/util';
+import { Route } from 'vue-router';
+import { mapGetters } from 'vuex';
 export default Vue.extend({
   components: {
     ConversationView,
@@ -44,18 +46,15 @@ export default Vue.extend({
     Sidebar,
     NoConversation,
   },
-  data() {
-    return {
-      messages: generateConversations(15, 10),
-    };
+  watch: {
+    $route(to: Route, from: Route) {
+      if (to.params.conversation !== from.params.conversation) {
+        this.$store.dispatch('app/messages/openConversation', to.params.conversation);
+      }
+    },
   },
   computed: {
-    conversations(): LocalMessage[] {
-      return filterToNewestMessageOfConversation(this.messages);
-    },
-    currentConversationMessages(): LocalMessage[] {
-      return this.messages.filter((msg) => msg.firstMessageName === this.$route.params.conversation);
-    },
+    ...mapGetters('app/messages', ['conversationPreviews', 'currentConversationMessages']),
   },
   methods: {
     conversationClicked(firstMessageName: string, event: Event) {
@@ -67,7 +66,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
   .prevent--overflow--scroll {
-    max-height: calc(100vh - 64px); // Factor out toolbar height. TODO: Adjust for differnet platforms.
+    max-height: calc(100vh - 64px); // Factor out toolbar height. TODO: Adjust for different platforms.
     overflow-y: auto;
   }
 </style>

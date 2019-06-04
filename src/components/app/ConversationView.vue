@@ -2,7 +2,7 @@
   <div class="conversation-view-parent">
     <v-toolbar flat>
       <v-toolbar-title class="headline">
-        <span>Subject {{$route.params.conversation}}</span>
+        <span>Subject {{messages.length ? messages[0].subject : $route.params.conversation}}</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn
@@ -18,7 +18,7 @@
       <v-card-title class="pb-0">
           <v-layout>
             <v-flex xs11 align-self-center>
-              <h2 class="mb-0">/u/{{message.correspondent}}</h2>
+              <h2 class="mb-0">/u/{{correspondent(message)}}</h2>
             </v-flex>
             <v-flex align-self-center>
               <v-btn flat color="orange" title="Reply"><v-icon>reply</v-icon></v-btn>  
@@ -40,12 +40,11 @@ export default Vue.extend({
       type: Array as () => LocalMessage[],
     },
   },
-  computed: {
-    correspondent(): string {
-      return this.$route.params.conversation;
+  methods: {
+    correspondent(conversation: LocalMessage) {
+      return conversation.owner.name === conversation.author ? conversation.dest : conversation.author;
     },
   },
-
   mounted() {
     /* TODO: This doesn't scroll to the bottom if you open a conversation, scroll up so the last
      message is no longer visible, then switch to another conversation. */
