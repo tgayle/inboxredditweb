@@ -15,17 +15,18 @@
       v-for="i in 30"
       :key="i"
       class="mb-2 conversation-message">
-      <v-card-title>
-        <div>
-          <div>
-            <h2 class="mb-0 d-inline">/u/{{i % 2 === 0 ? 'you' : correspondent}}</h2>
-            <div class="text-xs-right d-inline">
-              <v-btn flat color="orange"><v-icon>reply</v-icon></v-btn>
-            </div>            
-          </div>
-          <div> {{ lorem }} </div>
-        </div>
+      <v-card-title class="pb-0">
+          <v-layout>
+            <v-flex xs11 align-self-center>
+              <h2 class="mb-0">/u/{{i % 2 === 0 ? 'you' : correspondent}}</h2>
+            </v-flex>
+            <v-flex align-self-center>
+              <v-btn flat color="orange" title="Reply"><v-icon>reply</v-icon></v-btn>  
+            </v-flex>           
+          </v-layout>
       </v-card-title>
+
+      <v-card-text class="pt-0">{{ lorem }}</v-card-text>
     </v-card>
   </div>
 </template>
