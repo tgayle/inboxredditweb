@@ -7,12 +7,19 @@
       <v-divider vertical/>
 
       <v-flex xs3 lg2 fill-height>
-      <recent-conversations class="prevent--overflow--scroll"/>
+      <recent-conversations 
+        class="prevent--overflow--scroll"
+        :conversations="conversations"
+        @conversation-click="conversationClicked"/>
       </v-flex>
       <v-divider vertical/>
 
       <v-flex>
-      <router-view name="masterView" class="prevent--overflow--scroll"></router-view>
+        <no-conversation v-if="!$route.params.conversation"/>
+        <conversation-view 
+          v-else 
+          class="prevent--overflow--scroll" 
+          :messages="currentConversationMessages" />
       </v-flex>
       <v-divider vertical/>
 
@@ -26,11 +33,34 @@ import Vue from 'vue';
 import ConversationView from '../components/app/ConversationView.vue';
 import RecentConversations from '../components/app/RecentConversations.vue';
 import Sidebar from '../components/app/Sidebar.vue';
+import NoConversation from '../components/app/NoConversation.vue';
+import { LocalMessage } from '../types/Types';
+
+import {generateConversations, filterToNewestMessageOfConversation} from '@/util';
 export default Vue.extend({
   components: {
     ConversationView,
     RecentConversations,
     Sidebar,
+    NoConversation,
+  },
+  data() {
+    return {
+      messages: generateConversations(15, 10),
+    };
+  },
+  computed: {
+    conversations(): LocalMessage[] {
+      return filterToNewestMessageOfConversation(this.messages);
+    },
+    currentConversationMessages(): LocalMessage[] {
+      return this.messages.filter((msg) => msg.firstMessageName === this.$route.params.conversation);
+    },
+  },
+  methods: {
+    conversationClicked(firstMessageName: string, event: Event) {
+      //
+    },
   },
 });
 </script>

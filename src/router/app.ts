@@ -11,9 +11,6 @@ const appRoutes: RouteConfig[] = [
   {
     path: ':where/:conversation',
     name: 'viewconversation',
-    components: {
-      masterView: () => import('../components/app/ConversationView.vue'),
-    },
   },
 ];
 

@@ -17,9 +17,9 @@
  */
 export type SourceInbox = 'sent' | 'inbox';
 
-export interface IMessage {
+export interface LocalMessage {
   id: string;
-  owner: IUser;
+  owner: LocalUser;
   author: string;
   dest: string;
   body: string;
@@ -33,21 +33,13 @@ export interface IMessage {
   from: SourceInbox;
 }
 
-export interface IUser {
+export interface LocalUser {
   id: string;
   name: string;
   accessToken: string;
   tokenExpirationDate: number;
   refreshToken: string;
-
-  messages: IMessage[];
 }
-
-export interface ClientUser {
-  name: string;
-  id: string;
-}
-
 export interface TokenRetrievalResponse {
   error?: string;
   code: string;
