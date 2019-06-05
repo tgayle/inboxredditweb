@@ -7,6 +7,8 @@ export interface AuthState {
   buttonState: AuthButtonState;
   redditAuthUrl: string;
   currentUser?: LocalUser;
+
+  users: LocalUser[];
 }
 
 export interface AuthButtonState {
@@ -36,6 +38,7 @@ const authState: AuthState = {
   },
 
   currentUser: undefined,
+  users: [],
 };
 
 export default authState;

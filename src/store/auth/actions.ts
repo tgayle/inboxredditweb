@@ -7,7 +7,7 @@ import { AuthState, clientId, userAgent } from './state';
 import { RootState } from '@/store';
 
 const authActions: ActionTree<AuthState, RootState> =  {
-  async appFirstLoaded({commit}) {
+  async appFirstLoaded({commit, dispatch}) {
     await databaseReady;
 
     const lastUser = localStorage.getItem('currentUser');
@@ -16,7 +16,9 @@ const authActions: ActionTree<AuthState, RootState> =  {
     if (!userInfo) { return; }
 
     commit('setCurrentUser', userInfo);
+    setInterval(() => dispatch('pollDatabaseForChanges'), 10000);
   },
+
   async loginUser({commit, rootState}, routeQueries: TokenRetrievalResponse) {
     commit('setLoggingIn', true);
     if (routeQueries.error) {
@@ -57,6 +59,16 @@ const authActions: ActionTree<AuthState, RootState> =  {
         commit('setRetryButton');
       }
     }
+  },
+  /**
+   * Checks database to make sure the store matches the database wherever possible. Can be called on
+   *  its own to force an update, but automatically updates periodically.
+   */
+  async pollDatabaseForChanges({dispatch}) {
+    dispatch('updateUsers');
+  },
+  async updateUsers({commit}) {
+      commit('setUsersList', userCollection.find());
   },
 };
 export default authActions;
