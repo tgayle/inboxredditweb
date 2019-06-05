@@ -2,7 +2,8 @@ import {Module} from 'vuex';
 import { RootState } from '@/store';
 
 import snoowrap from 'snoowrap';
-import { TokenRetrievalResponse } from '@/types/Types';
+import { TokenRetrievalResponse, LocalUser } from '@/types/Types';
+import { userCollection, databaseReady } from '@/persistence/InboxDatabase';
 
 interface AuthButtonState {
   shown: boolean;
@@ -15,6 +16,7 @@ interface AuthState {
   loginStatus: string;
   buttonState: AuthButtonState;
   redditAuthUrl: string;
+  currentUser?: LocalUser;
 }
 
 const redditAuthUrl = snoowrap.getAuthUrl({
@@ -23,6 +25,9 @@ const redditAuthUrl = snoowrap.getAuthUrl({
   permanent: true,
   scope: ['identity', 'privatemessages', 'read', 'report'],
 });
+
+const clientId  = process.env.VUE_APP_CLIENTID as string;
+const userAgent = process.env.VUE_APP_USERAGENT as string;
 
 const authModule: Module<AuthState, RootState> = {
   namespaced: true,
@@ -35,6 +40,8 @@ const authModule: Module<AuthState, RootState> = {
       text: 'Retry',
       link: redditAuthUrl,
     },
+
+    currentUser: undefined,
   },
   mutations: {
     setLoggingIn(state, loggingIn: boolean) {
@@ -63,8 +70,36 @@ const authModule: Module<AuthState, RootState> = {
         link: '/app',
       };
     },
+    setCurrentUser(state, user: LocalUser) {
+      state.currentUser = user;
+      localStorage.setItem('currentUser', user.name);
+      console.log(`Current user is ${state.currentUser.name}`);
+    },
+  },
+  getters: {
+    snoowrap(state) {
+      if (state.currentUser) {
+        return new snoowrap({
+          accessToken: state.currentUser.accessToken,
+          refreshToken: state.currentUser.refreshToken,
+          clientId,
+          userAgent,
+        });
+      }
+      return undefined;
+    },
   },
   actions: {
+    async appFirstLoaded({commit}) {
+      await databaseReady;
+
+      const lastUser = localStorage.getItem('currentUser');
+      if (!lastUser) { return; }
+      const userInfo = userCollection.findOne({name: lastUser});
+      if (!userInfo) { return; }
+
+      commit('setCurrentUser', userInfo);
+    },
     async loginUser({commit, rootState}, routeQueries: TokenRetrievalResponse) {
       commit('setLoggingIn', true);
       if (routeQueries.error) {
@@ -73,16 +108,31 @@ const authModule: Module<AuthState, RootState> = {
       } else {
         try {
           const args = {
-            clientId: process.env.VUE_APP_CLIENTID as string,
+            clientId,
+            userAgent,
             redirectUri: process.env.VUE_APP_REDIRECT as string,
-            userAgent: process.env.VUE_APP_USERAGENT as string,
             code: routeQueries.code,
           };
           const userSnoowrap = await snoowrap.fromAuthCode(args);
-          // TODO: Persist user login.
-          commit('setLoggingIn', false);
-          commit('setLoginStatus', `Success! Hello /u/${await userSnoowrap.getMe().name}`);
-          commit('setContinueButton');
+          // snoowrap typings require using .then instead of await
+          userSnoowrap.getMe().then((userInfo) => {
+           let currentUser: LocalUser | null | undefined = userCollection.findOne({id: userInfo.id});
+
+           if (!currentUser) {
+              currentUser = userCollection.insert({
+                accessToken: userSnoowrap.accessToken,
+                refreshToken: userSnoowrap.refreshToken,
+                id: userInfo.id,
+                name: userInfo.name,
+                tokenExpirationDate: userSnoowrap.tokenExpiration,
+              });
+            }
+
+           commit('setLoggingIn', false);
+           commit('setLoginStatus', `Success! Hello /u/${userInfo.name}`);
+           commit('setContinueButton');
+           commit('setCurrentUser', currentUser);
+          });
         } catch (e) {
           const errorMessage = e.message; // TODO: Prettify error message.
           commit('setLoggingIn', false);
