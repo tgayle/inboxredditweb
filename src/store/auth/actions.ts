@@ -20,7 +20,16 @@ const authActions: ActionTree<AuthState, RootState> =  {
     dispatch('pollDatabaseForChanges');
     setInterval(() => dispatch('pollDatabaseForChanges'), 10000);
   },
+  async switchUser({commit}, username?: string) {
+    if (!username) {return; }
 
+    const userInfo = userCollection.findOne({name: username});
+    if (!userInfo) {
+      console.log('Tried to switch to a user that doesn\'t exist?:', username);
+    } else {
+      commit('setCurrentUser', userInfo);
+    }
+  },
   async loginUser({commit, rootState}, routeQueries: TokenRetrievalResponse) {
     commit('setLoggingIn', true);
     if (routeQueries.error) {

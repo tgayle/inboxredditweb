@@ -44,6 +44,7 @@ export default Vue.extend({
   methods: {
     userClicked(user: LocalUser) {
       console.log(`Toolbar user clicked: ${user.name}`);
+      this.$store.dispatch('auth/switchUser', user.name);
     },
     addAccountPressed() {
       window.location.href = this.redditAuthUrl;
