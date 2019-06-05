@@ -1,20 +1,7 @@
 <template>
   <div class="app">
     <v-app dark>
-      <v-toolbar app>
-        <v-toolbar-title class="headline">
-          <span>Inbox</span>
-        </v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn
-          flat
-          href="https://github.com/vuetifyjs/vuetify/releases/latest"
-          target="_blank"
-        >
-          <span class="mr-2">Latest Release</span>
-          <v-icon>open_in_new</v-icon>
-        </v-btn>
-      </v-toolbar>
+      <main-toolbar/>
 
       <v-content>
         <router-view></router-view>
@@ -23,13 +10,19 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import Vue from 'vue';
+import MainToolbar from './components/MainToolbar.vue';
+
+export default Vue.extend({
   name: 'App',
+  components: {
+    MainToolbar,
+  },
   mounted() {
     this.$store.dispatch('auth/appFirstLoaded');
-  }
-}
+  },
+});
 </script>
 
 <style lang="scss">

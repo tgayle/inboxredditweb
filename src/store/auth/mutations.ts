@@ -35,11 +35,6 @@ const authMutations: MutationTree<AuthState> = {
     console.log(`Current user is ${state.currentUser.name}`);
   },
   setUsersList(state, users: LocalUser[]) {
-    for (const user of state.users) {
-      for (const newUser of users) {
-        if (user.name !== newUser.name) { return; }
-      }
-    }
     state.users = users;
   },
 };

@@ -16,6 +16,8 @@ const authActions: ActionTree<AuthState, RootState> =  {
     if (!userInfo) { return; }
 
     commit('setCurrentUser', userInfo);
+
+    dispatch('pollDatabaseForChanges');
     setInterval(() => dispatch('pollDatabaseForChanges'), 10000);
   },
 
