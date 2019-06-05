@@ -7,16 +7,16 @@
       @click="$emit('conversation-click', convo.firstMessageName, $event)">
         <v-list-tile-content>
           <v-list-tile-title>
-            <v-layout>
-              <v-flex xs11 align-self-center>
-                {{`Subject ${convo.firstMessageName}`}}
-              </v-flex>
-              <v-flex align-self-center>
-                <v-icon class="pl-5">{{wasMe(convo) ? 'call_made' : 'call_received'}}</v-icon> 
-              </v-flex>
-            </v-layout>
+            <div class="recentconversation--grid">
+                <p class="recentconversation--subject recentconversation--grid--subject">{{convo.subject}}</p>
+              <div class="recentconversation--grid--sentreceived">
+                <v-icon class="">{{wasMe(convo) ? 'call_made' : 'call_received'}}</v-icon> 
+              </div>
+            </div>
           </v-list-tile-title>
-          <v-list-tile-sub-title>{{`Conversation message, correspondent ${correspondent(convo)}`}}</v-list-tile-sub-title>
+          <v-list-tile-sub-title>
+            <span class='text--primary'>/u/{{correspondent(convo)}}</span> &mdash; {{convo.body}}
+          </v-list-tile-sub-title>
         </v-list-tile-content>
     </v-list-tile>
   </v-list>
@@ -25,6 +25,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { LocalMessage } from '../../types/Types';
+import { mapGetters } from 'vuex';
 export default Vue.extend({
   props: {
     conversations: {
@@ -33,15 +34,44 @@ export default Vue.extend({
   },
   methods: {
     wasMe(conversation: LocalMessage) {
-      return conversation.owner.name === conversation.author;
+      return this.nameFromId(conversation.owner) === conversation.author;
     },
     correspondent(conversation: LocalMessage) {
-      return conversation.owner.name === conversation.author ? conversation.dest : conversation.author;
+      return this.nameFromId(conversation.owner) === conversation.author ? conversation.dest : conversation.author;
     },
+  },
+  computed: {
+    ...mapGetters('auth', ['nameFromId']),
   },
 });
 </script>
 
 
-<style>
+<style lang="scss">
+
+.recentconversation {
+  &--subject {
+    text-overflow: ellipsis;
+  }
+
+  &--grid {
+    display: grid;
+    grid-template-columns: [main] 9fr [meta] 1fr;
+    grid-template-rows: [subject] 1fr;
+
+    &--subject {
+      grid-column-start: main;
+      grid-row-start: subject;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    &--sentreceived {
+      grid-column-start: meta;
+      grid-row-start: subject;
+    }
+  }
+}
+
+
 </style>

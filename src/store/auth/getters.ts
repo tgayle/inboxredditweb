@@ -15,6 +15,9 @@ const authGetters: GetterTree<AuthState, RootState> = {
     }
     return undefined;
   },
+  nameFromId: (state) => (id: string) => {
+    return state.users.filter((user) => user.id === id)[0];
+  },
 };
 
 export default authGetters;

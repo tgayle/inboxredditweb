@@ -57,7 +57,7 @@ export function generateConversations(numConversations: number, messagesPerConve
         id: `t4_${thisMessageName}_${from}`,
         isNew: faker.random.boolean(),
         name: `t4_${thisMessageName}`,
-        owner,
+        owner: owner.id,
         subject: j + '',
       });
 

@@ -1,14 +1,15 @@
+import snoowrap from 'snoowrap';
 
 /**
  * TS declarations don't include the actual snoowrap class objects, so store these here for checking
  * types with `instanceof`.
  */
-// // @ts-ignore
-// export const RemotePrivateMessage = snoowrap.objects.PrivateMessage;
-// // @ts-ignore
-// export const RemoteComment = snoowrap.objects.PrivateMessage;
+// @ts-ignore
+export const RemotePrivateMessage = snoowrap.objects.PrivateMessage;
+// @ts-ignore
+export const RemoteComment = snoowrap.objects.PrivateMessage;
 
-// export type IRemotePrivateMessage = snoowrap.PrivateMessage;
+export type IRemotePrivateMessage = snoowrap.PrivateMessage;
 
 /**
  * Since users can send themselves messages, keep track of whether
@@ -27,7 +28,7 @@ export interface LocalMessage {
    * If you want the id that reddit uses when referring to messages, use the `name` property.
    */
   id: string;
-  owner: LocalUser;
+  owner: string; // User id, not username
   author: string;
   dest: string;
   body: string;

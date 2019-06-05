@@ -34,15 +34,19 @@
 <script lang="ts">
 import Vue from 'vue';
 import {LocalMessage} from '@/types/Types';
+import { mapGetters } from 'vuex';
 export default Vue.extend({
   props: {
     messages: {
       type: Array as () => LocalMessage[],
     },
   },
+  computed: {
+    ...mapGetters('auth', ['nameFromId']),
+  },
   methods: {
     correspondent(conversation: LocalMessage) {
-      return conversation.owner.name === conversation.author ? conversation.dest : conversation.author;
+      return this.nameFromId(conversation.owner) === conversation.author ? conversation.dest : conversation.author;
     },
   },
   mounted() {
