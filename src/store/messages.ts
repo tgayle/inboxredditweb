@@ -1,4 +1,4 @@
-import { RootState } from '@/store';
+import { RootState, getSnoowrap } from '@/store';
 import { Module } from 'vuex';
 import { LocalMessage, SourceInbox, RemotePrivateMessage } from '@/types/Types';
 import { generateConversations, filterToNewestMessageOfConversation } from '@/util';
@@ -38,7 +38,7 @@ const messagesModule: Module<MessagesState, RootState> = {
       commit('setCurrentConversation', firstMessageName);
     },
     async loadAllMessages(context) {
-      const snoo: snoowrap = context.rootGetters['auth/snoowrap'];
+      const snoo = getSnoowrap(context);
 
       console.log('Loading messages...');
 
@@ -55,17 +55,21 @@ const messagesModule: Module<MessagesState, RootState> = {
         mapRemoteMessagesToLocal(allSent, owner, 'sent'),
       ]);
 
+      let successfullySaved = 0;
+      let numErrors = 0;
+      // Insert each separately so we can ignore errors.
       for (const msg of messagesToSave.flat()) {
         try {
-          const transaction = messageCollection.insert(msg);
-          console.log(msg);
-          console.log(`${transaction ? transaction.id : 'idk'} saved!!`);
+          messageCollection.insert(msg);
+          successfullySaved++;
         } catch (error) {
-          console.log(error.message);
+          if (!error.message.includes('Duplicate key')) { console.log(error); }
+          numErrors++;
         }
       }
 
       context.commit('setMessages', messageCollection.find());
+      console.log(successfullySaved, 'messages saved,', numErrors, 'errors.');
     },
   },
 };

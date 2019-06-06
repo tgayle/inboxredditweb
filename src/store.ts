@@ -1,9 +1,10 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex, { ActionContext } from 'vuex';
 
 import authModule from './store/auth/index';
 import appModule from './store/app';
 import uiModule from './store/ui/ui';
+import snoowrap from 'snoowrap';
 
 Vue.use(Vuex);
 
@@ -16,3 +17,7 @@ export default new Vuex.Store<RootState>({
     ui: uiModule,
   },
 });
+
+export function getSnoowrap<T>(context: ActionContext<T, RootState>) {
+  return context.rootGetters['auth/snoowrap'] as snoowrap;
+}

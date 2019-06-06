@@ -26,6 +26,17 @@ export default new Router({
       name: 'app',
       component: () => import('../pages/MessagingApp.vue'),
       children: appRoutes,
+      beforeEnter(to, from, next) {
+        if (!to.params.where) {
+          return next({
+            name: 'app',
+            params: {
+              where: 'inbox',
+            },
+          });
+        }
+        next();
+      },
     },
     {
       path: '/about',
