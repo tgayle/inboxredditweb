@@ -74,13 +74,13 @@ const messagesModule: Module<MessagesState, RootState> = {
   },
 };
 
-function mapRemoteMessagesToLocal(messages: any[], owner: string, sourceInbox: SourceInbox): Promise<LocalMessage[]> {
-  return Promise.all(messages
+function mapRemoteMessagesToLocal(messages: any[], owner: string, sourceInbox: SourceInbox): LocalMessage[] {
+  return messages
     .filter(isPrivateMessage)
     .map((msg) => {
       const mappedMessage: LocalMessage = mapRemoteMessageToLocal(msg, owner, sourceInbox);
       return mappedMessage;
-    }));
+    });
 }
 
 function mapRemoteMessageToLocal(msg: snoowrap.PrivateMessage,
