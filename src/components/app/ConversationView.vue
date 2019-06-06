@@ -2,7 +2,7 @@
   <div class="conversation-view-parent">
     <v-toolbar flat>
       <v-toolbar-title class="headline">
-        <span>Subject {{messages.length ? messages[0].subject : $route.params.conversation}}</span>
+        <span>{{messages.length ? messages[0].subject : $route.params.conversation}}</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn

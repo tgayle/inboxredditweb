@@ -18,6 +18,7 @@ const authActions: ActionTree<AuthState, RootState> =  {
     commit('setCurrentUser', userInfo);
 
     dispatch('pollDatabaseForChanges');
+    dispatch('app/messages/beginPeriodicUpdates', undefined, {root: true});
     setInterval(() => dispatch('pollDatabaseForChanges'), 10000);
   },
   async switchUser({commit}, username?: string) {

@@ -2,6 +2,7 @@ import loki from 'lokijs';
 // tslint:disable-next-line:no-var-requires
 const lokiIndexedAdapter = require('lokijs/src/loki-indexed-adapter');
 import { LocalUser, LocalMessage } from '@/types/Types';
+import { filterToNewestMessageOfConversation } from '@/util';
 
 /**
  * Save the databaseReady promise resolver to a variable so that the rest of the application can wait
@@ -45,7 +46,7 @@ function prepareDatabase() {
 
   userCollection = db.getCollection('users');
   messageCollection = db.getCollection('messages');
-  console.log(userCollection.find());
+  console.log(userCollection.find().length, 'users in database.');
 
   dbReadyResolver();
 }

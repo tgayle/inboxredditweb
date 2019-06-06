@@ -19,7 +19,7 @@
         <conversation-view 
           v-else 
           class="prevent--overflow--scroll" 
-          :messages="currentConversationMessages" />
+          :messages="conversationMessages" />
       </v-flex>
       <v-divider vertical/>
 
@@ -38,7 +38,7 @@ import { LocalMessage } from '../types/Types';
 
 import {generateConversations, filterToNewestMessageOfConversation} from '@/util';
 import { Route } from 'vue-router';
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 export default Vue.extend({
   components: {
     ConversationView,
@@ -54,7 +54,7 @@ export default Vue.extend({
     },
   },
   computed: {
-    ...mapGetters('app/messages', ['conversationPreviews', 'currentConversationMessages']),
+    ...mapState('app/messages', ['conversationPreviews', 'conversationMessages']),
   },
   methods: {
     conversationClicked(firstMessageName: string, event: Event) {

@@ -8,34 +8,49 @@ import { messageCollection } from '@/persistence/InboxDatabase';
 interface MessagesState {
   conversationMessages: LocalMessage[];
   currentConversation?: string;
+  conversationPreviews: LocalMessage[];
 
 }
 
 const messagesModule: Module<MessagesState, RootState> = {
   namespaced: true,
   state: {
-    conversationMessages: generateConversations(30, 45),
+    conversationMessages: [],
+    conversationPreviews: [],
     currentConversation: undefined,
   },
   mutations: {
     setCurrentConversation(state, name: string) {
       state.currentConversation = name;
     },
-    setMessages(state, messages: LocalMessage[]) {
+    setConversationPreviews(state, conversations: LocalMessage[]) {
+      state.conversationPreviews = conversations;
+    },
+    setConversationMessages(state, messages: LocalMessage[]) {
       state.conversationMessages = messages;
     },
   },
-  getters: {
-    conversationPreviews(state) {
-      return filterToNewestMessageOfConversation(state.conversationMessages || []);
-    },
-    currentConversationMessages(state) {
-      return state.conversationMessages.filter((msg) => msg.firstMessageName === state.currentConversation);
-    },
-  },
   actions: {
+    async beginPeriodicUpdates({dispatch}) {
+      dispatch('updateRecentConversations');
+
+      setTimeout(() => {
+        dispatch('updateRecentConversations');
+      }, 10000);
+    },
     async openConversation({commit, dispatch}, firstMessageName: string) {
       commit('setCurrentConversation', firstMessageName);
+      commit('setConversationMessages', messageCollection.find({
+        firstMessageName,
+      }));
+    },
+    async updateRecentConversations({commit}) {
+      const recents = messageCollection.chain()
+        .find()
+        .simplesort('createdUtc', {desc: true})
+        .mapReduce(conversationResolver.mapper, conversationResolver.reducer);
+
+      commit('setConversationPreviews', recents.reverse());
     },
     async loadAllMessages(context) {
       const snoo = getSnoowrap(context);
@@ -68,7 +83,6 @@ const messagesModule: Module<MessagesState, RootState> = {
         }
       }
 
-      context.commit('setMessages', messageCollection.find());
       console.log(successfullySaved, 'messages saved,', numErrors, 'errors.');
     },
   },
@@ -104,5 +118,14 @@ function mapRemoteMessageToLocal(msg: snoowrap.PrivateMessage,
 function isPrivateMessage(msg: any): msg is snoowrap.PrivateMessage {
   return msg instanceof RemotePrivateMessage;
 }
+
+const conversationResolver = {
+  mapper(message: LocalMessage) {
+    return message;
+  },
+  reducer(messages: LocalMessage[]) {
+    return filterToNewestMessageOfConversation(messages);
+  },
+};
 
 export default messagesModule;
