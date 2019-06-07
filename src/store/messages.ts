@@ -1,7 +1,7 @@
-import { RootState, getSnoowrap } from '@/store';
+import { RootState, getSnoowrap, getCurrentUser } from '@/store';
 import { Module } from 'vuex';
 import { LocalMessage, SourceInbox, RemotePrivateMessage } from '@/types/Types';
-import { generateConversations, filterToNewestMessageOfConversation } from '@/util';
+import { filterToNewestMessageOfConversation } from '@/util';
 import snoowrap from 'snoowrap';
 import { messageCollection } from '@/persistence/InboxDatabase';
 
@@ -32,21 +32,36 @@ const messagesModule: Module<MessagesState, RootState> = {
   },
   actions: {
     async beginPeriodicUpdates({dispatch}) {
-      dispatch('updateRecentConversations');
+      dispatch('update');
 
-      setTimeout(() => {
-        dispatch('updateRecentConversations');
+      setInterval(() => {
+        dispatch('update');
       }, 10000);
     },
-    async openConversation({commit, dispatch}, firstMessageName: string) {
+    /**
+     * Updates values in state to reflect DB so we can display in view.
+     */
+    async update({dispatch}) {
+      dispatch('updateRecentConversations');
+    },
+    async openConversation(context, firstMessageName: string) {
+      const {commit} = context;
+
+      const currentUser = getCurrentUser(context);
       commit('setCurrentConversation', firstMessageName);
       commit('setConversationMessages', messageCollection.find({
+        owner: currentUser ? currentUser.id : undefined,
         firstMessageName,
       }));
     },
-    async updateRecentConversations({commit}) {
+    async updateRecentConversations(context) {
+      const {commit} = context;
+      const currentUser = getCurrentUser(context);
+
       const recents = messageCollection.chain()
-        .find()
+        .find({
+          owner: currentUser ? currentUser.id : undefined,
+        })
         .simplesort('createdUtc', {desc: true})
         .mapReduce(conversationResolver.mapper, conversationResolver.reducer);
 

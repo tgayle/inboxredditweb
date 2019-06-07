@@ -5,6 +5,7 @@ import authModule from './store/auth/index';
 import appModule from './store/app';
 import uiModule from './store/ui/ui';
 import snoowrap from 'snoowrap';
+import { LocalUser } from './types/Types';
 
 Vue.use(Vuex);
 
@@ -20,4 +21,8 @@ export default new Vuex.Store<RootState>({
 
 export function getSnoowrap<T>(context: ActionContext<T, RootState>) {
   return context.rootGetters['auth/snoowrap'] as snoowrap;
+}
+
+export function getCurrentUser<T>(context: ActionContext<T, RootState>) {
+  return (context.rootState as any).auth.currentUser as LocalUser | undefined;
 }

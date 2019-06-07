@@ -21,7 +21,7 @@ const authActions: ActionTree<AuthState, RootState> =  {
     dispatch('app/messages/beginPeriodicUpdates', undefined, {root: true});
     setInterval(() => dispatch('pollDatabaseForChanges'), 10000);
   },
-  async switchUser({commit}, username?: string) {
+  async switchUser({commit, dispatch}, username?: string) {
     if (!username) {return; }
 
     const userInfo = userCollection.findOne({name: username});
@@ -29,6 +29,7 @@ const authActions: ActionTree<AuthState, RootState> =  {
       console.log('Tried to switch to a user that doesn\'t exist?:', username);
     } else {
       commit('setCurrentUser', userInfo);
+      dispatch('app/messages/update', undefined, {root: true});
     }
   },
   async loginUser({commit, rootState}, routeQueries: TokenRetrievalResponse) {
