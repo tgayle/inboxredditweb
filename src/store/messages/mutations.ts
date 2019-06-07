@@ -12,4 +12,7 @@ export const mutations: MutationTree<MessagesState> = {
   setConversationMessages(state, messages: LocalMessage[]) {
     state.conversationMessages = messages;
   },
+  setRefreshing(state, refreshing: boolean) {
+    state.refreshing = refreshing;
+  },
 };

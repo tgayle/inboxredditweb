@@ -26,7 +26,7 @@
           </v-layout>
       </v-card-title>
 
-      <v-card-text class="pt-0">{{ message.body }}</v-card-text>
+      <v-card-text class="pt-0" v-html="parseMarkdown(message.body)"> </v-card-text>
     </v-card>
   </div>
 </template>
@@ -35,6 +35,9 @@
 import Vue from 'vue';
 import {LocalMessage} from '@/types/Types';
 import { mapGetters } from 'vuex';
+// @ts-ignore-next-line
+import snuownd from 'snuownd';
+
 export default Vue.extend({
   props: {
     messages: {
@@ -47,6 +50,9 @@ export default Vue.extend({
   methods: {
     correspondent(conversation: LocalMessage) {
       return this.nameFromId(conversation.owner) === conversation.author ? conversation.dest : conversation.author;
+    },
+    parseMarkdown(str: string) {
+      return snuownd.getParser().render(str);
     },
   },
   mounted() {

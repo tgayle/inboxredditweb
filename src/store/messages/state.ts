@@ -4,6 +4,8 @@ export interface MessagesState {
   conversationMessages: LocalMessage[];
   currentConversation?: string;
   conversationPreviews: LocalMessage[];
+
+  refreshing?: boolean;
 }
 
 export const state: MessagesState = {

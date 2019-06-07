@@ -9,6 +9,7 @@
       <v-flex xs3 lg2 fill-height>
       <recent-conversations 
         class="prevent--overflow--scroll"
+        :loadingBar="refreshing"
         :conversations="conversationPreviews"
         @conversation-click="conversationClicked"/>
       </v-flex>
@@ -54,7 +55,7 @@ export default Vue.extend({
     },
   },
   computed: {
-    ...mapState('app/messages', ['conversationPreviews', 'conversationMessages']),
+    ...mapState('app/messages', ['conversationPreviews', 'conversationMessages', 'refreshing']),
   },
   methods: {
     conversationClicked(firstMessageName: string, event: Event) {

@@ -25,10 +25,17 @@ export const actions: ActionTree<MessagesState, RootState> = {
 
     const currentUser = getCurrentUser(context);
     commit('setCurrentConversation', firstMessageName);
-    commit('setConversationMessages', messageCollection.find({
-      owner: currentUser ? currentUser.id : undefined,
-      firstMessageName,
-    }));
+
+    const messages = messageCollection
+      .chain()
+      .find({
+        owner: currentUser ? currentUser.id : undefined,
+        firstMessageName,
+      })
+      .simplesort('createdUtc')
+      .data();
+
+    commit('setConversationMessages', messages);
   },
   async updateRecentConversations(context) {
     const {commit} = context;
@@ -43,18 +50,37 @@ export const actions: ActionTree<MessagesState, RootState> = {
 
     commit('setConversationPreviews', recents.reverse());
   },
-  async loadAllMessages(context) {
+  async loadNewestMessages(context) {
+    context.commit('setRefreshing', true);
+    const currentUser = getCurrentUser(context);
+    const newestMessage = messageCollection
+      .chain()
+      .find({
+        owner: currentUser ? currentUser.id : undefined,
+      })
+      .simplesort('createdUtc', {desc: true})
+      .limit(1)
+      .data()[0];
+
+    context.dispatch('loadAllMessages', newestMessage ? newestMessage.name : undefined);
+  },
+  async loadAllMessages(context, before?: string) {
+    context.commit('setRefreshing', true);
     const snoo = getSnoowrap(context);
 
-    console.log('Loading messages...');
+    console.log('Loading messages...', 'Before: ', before);
 
     const owner = await snoo.getMe().id;
     const [initialInbox, initialSent] = await Promise.all([
-      snoo.getInbox({filter: 'messages'}),
-      snoo.getSentMessages(),
+      snoo.getInbox({ before } as any),
+      snoo.getSentMessages({before}),
     ]);
 
-    const [allInbox, allSent] = await Promise.all([initialInbox.fetchAll(), initialSent.fetchAll()]);
+    const [allInbox, allSent] = await Promise.all([
+      initialInbox.fetchAll(),
+      initialSent.fetchAll(),
+    ]);
+
     console.log('Messages loaded.');
     const messagesToSave = await Promise.all([
       mapRemoteMessagesToLocal(allInbox, owner, 'inbox'),
@@ -75,6 +101,7 @@ export const actions: ActionTree<MessagesState, RootState> = {
     }
 
     console.log(successfullySaved, 'messages saved,', numErrors, 'errors.');
+    context.commit('setRefreshing', false);
   },
 };
 
