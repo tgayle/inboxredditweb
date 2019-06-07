@@ -6,6 +6,7 @@ export interface MessagesState {
   conversationPreviews: LocalMessage[];
 
   refreshing?: boolean;
+  messagesLastRefreshed?: Date;
 }
 
 export const state: MessagesState = {

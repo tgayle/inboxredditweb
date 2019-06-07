@@ -3,7 +3,26 @@
     <v-toolbar-title class="headline">
       <span>Inbox</span>
     </v-toolbar-title>
+
+    <span 
+      v-if="currentUser" 
+      :title="formatDate(messagesLastRefreshed)"
+      class="ml-2">Last refresh: {{messagesLastRefreshedPretty}}</span>
     <v-spacer></v-spacer>
+
+    <v-toolbar-items v-if="currentUser">
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn flat v-on="on" @click="$store.dispatch('app/messages/refreshMessages')">
+            <transition>
+              <v-progress-circular v-if="refreshing" indeterminate></v-progress-circular>
+              <v-icon v-else>refresh</v-icon>
+            </transition>
+          </v-btn>
+        </template>
+        <span>Refresh messages</span>
+      </v-tooltip>
+    </v-toolbar-items>
     <v-menu bottom left offset-y v-if="currentUser">
       <template v-slot:activator="{ on }">
         <v-btn
@@ -35,11 +54,18 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import { LocalUser } from '../types/Types';
+
+import moment from 'moment';
 export default Vue.extend({
   computed: {
     ...mapState('auth', ['users', 'currentUser', 'redditAuthUrl']),
+    ...mapState('app/messages', ['messagesLastRefreshed', 'refreshing']),
+    ...mapGetters('app/messages', ['messagesLastRefreshedPretty']),
+  },
+  watch: {
+
   },
   methods: {
     userClicked(user: LocalUser) {
@@ -48,6 +74,9 @@ export default Vue.extend({
     },
     addAccountPressed() {
       window.location.href = this.redditAuthUrl;
+    },
+    formatDate(date: Date) {
+      return moment(date).format();
     },
   },
 });

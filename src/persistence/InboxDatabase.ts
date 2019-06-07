@@ -27,6 +27,29 @@ export const db = new loki('inbox.db', {
 export let userCollection: Collection<LocalUser>;
 export let messageCollection: Collection<LocalMessage>;
 
+// https://github.com/techfort/LokiJS/issues/158#issue-83960012
+export function upsert<T extends {}>(collection: Collection<T>, idField: keyof T, document: T) {
+  const query: any = {};
+  query[idField] = document[idField];
+  const existingRecord = collection.findOne(query);
+
+  if (existingRecord) {
+    // The document exists. Do an update.
+    let updatedRecord = existingRecord;
+    // Only update the fields contained in `document`. All fields not contained
+    // in `document` remain unchanged.
+    updatedRecord = {
+      ...existingRecord,
+      ...document,
+    };
+
+    collection.update(updatedRecord);
+  } else {
+    // The document doesn't exist. Do an insert.
+    collection.insert(document);
+  }
+}
+
 function prepareDatabase() {
   if (!db.getCollection('users')) {
     console.log('Created users collection');
