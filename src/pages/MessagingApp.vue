@@ -47,6 +47,11 @@ export default Vue.extend({
     Sidebar,
     NoConversation,
   },
+  mounted() {
+    if (this.$route.params.conversation) {
+      this.$store.dispatch('app/messages/openConversation', this.$route.params.conversation);
+    }
+  },
   watch: {
     $route(to: Route, from: Route) {
       if (to.params.conversation !== from.params.conversation) {
