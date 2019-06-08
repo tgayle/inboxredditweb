@@ -2,7 +2,8 @@
   <div class="conversation-view-parent">
     <v-toolbar flat>
       <v-toolbar-title class="headline">
-        <span>{{messages.length ? messages[0].subject : $route.params.conversation}}</span>
+        <span>{{messages.length ? messages[0].subject : $route.params.conversation}} | </span>
+        <span class='text--primary subheading'>/u/{{messages.length ? correspondent(messages[0]) : 'unknown'}}</span> 
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn
@@ -18,7 +19,7 @@
       <v-card-title class="pb-0">
           <v-layout>
             <v-flex xs11 align-self-center>
-              <h2 class="mb-0">/u/{{correspondent(message)}}</h2>
+              <h2 class="mb-0">/u/{{message.author}}</h2>
             </v-flex>
             <v-flex align-self-center>
               <v-btn flat title="Reply"><v-icon>reply</v-icon></v-btn>  
