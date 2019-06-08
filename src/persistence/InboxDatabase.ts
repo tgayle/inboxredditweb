@@ -2,7 +2,6 @@ import loki from 'lokijs';
 // tslint:disable-next-line:no-var-requires
 const lokiIndexedAdapter = require('lokijs/src/loki-indexed-adapter');
 import { LocalUser, LocalMessage } from '@/types/Types';
-import { filterToNewestMessageOfConversation } from '@/util';
 
 /**
  * Save the databaseReady promise resolver to a variable so that the rest of the application can wait
