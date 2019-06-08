@@ -14,10 +14,8 @@
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn flat v-on="on" @click="$store.dispatch('app/messages/refreshMessages')">
-            <transition>
-              <v-progress-circular v-if="refreshing" indeterminate></v-progress-circular>
-              <v-icon v-else>refresh</v-icon>
-            </transition>
+              <v-icon v-show="!refreshing">refresh</v-icon>
+              <v-progress-circular v-show="refreshing" indeterminate></v-progress-circular>
           </v-btn>
         </template>
         <span>Refresh messages</span>

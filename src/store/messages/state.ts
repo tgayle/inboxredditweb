@@ -12,6 +12,7 @@ export interface MessagesState {
 export const state: MessagesState = {
   conversationMessages: [],
   conversationPreviews: [],
+  refreshing: false,
   currentConversation: undefined,
   messagesLastRefreshed: undefined,
 };
