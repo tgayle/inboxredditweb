@@ -5,28 +5,41 @@ import { messageCollection, upsert } from '@/persistence/InboxDatabase';
 import { SourceInbox, LocalMessage, RemotePrivateMessage } from '@/types/Types';
 import snoowrap from 'snoowrap';
 import { filterToNewestMessageOfConversation } from '@/util';
+import { SET_CURRENT_CONVERSATION, SET_CONVERSATION_MESSAGES, SET_CONVERSATION_PREVIEWS,
+         SET_REFRESHING, SET_MESSAGES_LAST_REFRESHED } from './mutations';
+
+export const BEGIN_PERIODIC_UPDATES = 'beginPeriodicUpdates';
+export const UPDATE = 'update';
+export const OPEN_CONVERSATION = 'openConversation';
+export const UPDATE_RECENT_CONVERSATIONS = 'updateRecentConversations';
+export const UPDATE_CONVERSATION_MESSAGES = 'updateConversationMessages';
+export const REFRESH_MESSAGES = 'refreshMessages';
+export const LOAD_UNREAD_MESSAGES = 'loadUnreadMessages';
+export const LOAD_NEWEST_MESSAGES = 'loadNewestMessages';
+export const LOAD_ALL_MESSAGES = 'loadAllMessages';
+
 
 export const actions: ActionTree<MessagesState, RootState> = {
-  async beginPeriodicUpdates({dispatch}) {
-    dispatch('update');
+  async [BEGIN_PERIODIC_UPDATES]({dispatch}) {
+    dispatch(UPDATE);
 
     setInterval(() => {
-      dispatch('update');
-      dispatch('refreshMessages');
+      dispatch(UPDATE);
+      dispatch(REFRESH_MESSAGES);
     }, 10000);
   },
   /**
    * Updates values in state to reflect DB so we can display in view.
    */
-  async update({dispatch}) {
-    dispatch('updateRecentConversations');
-    dispatch('updateConversationMessages');
+  async [UPDATE]({dispatch}) {
+    dispatch(UPDATE_RECENT_CONVERSATIONS);
+    dispatch(UPDATE_CONVERSATION_MESSAGES);
   },
-  async openConversation(context, firstMessageName: string) {
+  async [OPEN_CONVERSATION](context, firstMessageName: string) {
     const {commit} = context;
 
     const currentUser = getCurrentUser(context);
-    commit('setCurrentConversation', firstMessageName);
+    commit(SET_CURRENT_CONVERSATION, firstMessageName);
 
     const messages = messageCollection
       .chain()
@@ -37,9 +50,9 @@ export const actions: ActionTree<MessagesState, RootState> = {
       .simplesort('createdUtc')
       .data();
 
-    commit('setConversationMessages', messages);
+    commit(SET_CONVERSATION_MESSAGES, messages);
   },
-  async updateRecentConversations(context) {
+  async [UPDATE_RECENT_CONVERSATIONS](context) {
     const {commit} = context;
     const currentUser = getCurrentUser(context);
 
@@ -50,28 +63,28 @@ export const actions: ActionTree<MessagesState, RootState> = {
       .simplesort('createdUtc', {desc: true})
       .mapReduce(conversationResolver.mapper, conversationResolver.reducer);
 
-    commit('setConversationPreviews', recents.reverse());
+    commit(SET_CONVERSATION_PREVIEWS, recents.reverse());
   },
-  async updateConversationMessages({dispatch, state}) {
+  async [UPDATE_CONVERSATION_MESSAGES]({dispatch, state}) {
     if (state.currentConversation) {
-      dispatch('openConversation', state.currentConversation);
+      dispatch(OPEN_CONVERSATION, state.currentConversation);
     }
   },
-  async refreshMessages(context) {
-    context.commit('setRefreshing', true);
+  async [REFRESH_MESSAGES](context) {
+    context.commit(SET_REFRESHING, true);
     try {
       await Promise.all([
-        context.dispatch('loadUnreadMessages'),
-        context.dispatch('loadNewestMessages'),
+        context.dispatch(LOAD_UNREAD_MESSAGES),
+        context.dispatch(LOAD_NEWEST_MESSAGES),
       ]);
     } catch (error) {
       console.log('Some error happened.');
     }
 
-    context.commit('setRefreshing', false);
-    context.commit('setMessagesLastRefreshed', Date.now());
+    context.commit(SET_REFRESHING, false);
+    context.commit(SET_MESSAGES_LAST_REFRESHED, Date.now());
   },
-  async loadUnreadMessages(context) {
+  async [LOAD_UNREAD_MESSAGES](context) {
     const currentUser = getCurrentUser(context);
     if (!currentUser) { return; }
 
@@ -94,7 +107,7 @@ export const actions: ActionTree<MessagesState, RootState> = {
 
     saveMessages(messagesToSave);
   },
-  async loadNewestMessages(context) {
+  async [LOAD_NEWEST_MESSAGES](context) {
     const currentUser = getCurrentUser(context);
     const newestMessage = messageCollection
       .chain()
@@ -105,9 +118,9 @@ export const actions: ActionTree<MessagesState, RootState> = {
       .limit(1)
       .data()[0];
 
-    await context.dispatch('loadAllMessages', newestMessage ? newestMessage.name : undefined);
+    await context.dispatch(LOAD_ALL_MESSAGES, newestMessage ? newestMessage.name : undefined);
   },
-  async loadAllMessages(context, before?: string) {
+  async [LOAD_ALL_MESSAGES](context, before?: string) {
     const snoo = getSnoowrap(context);
 
     const owner = await snoo.getMe().id;

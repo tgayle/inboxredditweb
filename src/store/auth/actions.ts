@@ -5,9 +5,17 @@ import { userCollection, databaseReady } from '@/persistence/InboxDatabase';
 import { ActionTree } from 'vuex';
 import { AuthState, clientId, userAgent } from './state';
 import { RootState } from '@/store';
+import { SET_USERS_LIST, RETRY_BUTTON_ACTIVE, SET_LOGIN_STATUS,
+         SET_LOGGING_IN, CONTINUE_BUTTON_ACTIVE, SET_CURRENT_USER } from './mutations';
+
+export const APP_FIRST_LOAD = 'appFirstLoaded';
+export const SWITCH_USER = 'switchUser';
+export const LOGIN_USER = 'loginUser';
+export const POLL_DB_FOR_CHANGES = 'pollDatabaseForChanges';
+export const UPDATE_USERS = 'updateUsers';
 
 const authActions: ActionTree<AuthState, RootState> =  {
-  async appFirstLoaded({commit, dispatch}) {
+  async [APP_FIRST_LOAD]({commit, dispatch}) {
     await databaseReady;
 
     const lastUser = localStorage.getItem('currentUser');
@@ -15,28 +23,28 @@ const authActions: ActionTree<AuthState, RootState> =  {
     const userInfo = userCollection.findOne({name: lastUser});
     if (!userInfo) { return; }
 
-    commit('setCurrentUser', userInfo);
+    commit(SET_CURRENT_USER, userInfo);
 
-    dispatch('pollDatabaseForChanges');
+    dispatch(POLL_DB_FOR_CHANGES);
     dispatch('app/messages/beginPeriodicUpdates', undefined, {root: true});
-    setInterval(() => dispatch('pollDatabaseForChanges'), 10000);
+    setInterval(() => dispatch(POLL_DB_FOR_CHANGES), 10000);
   },
-  async switchUser({commit, dispatch}, username?: string) {
+  async [SWITCH_USER]({commit, dispatch}, username?: string) {
     if (!username) {return; }
 
     const userInfo = userCollection.findOne({name: username});
     if (!userInfo) {
       console.log('Tried to switch to a user that doesn\'t exist?:', username);
     } else {
-      commit('setCurrentUser', userInfo);
+      commit(SET_CURRENT_USER, userInfo);
       dispatch('app/messages/update', undefined, {root: true});
     }
   },
-  async loginUser({commit, rootState}, routeQueries: TokenRetrievalResponse) {
-    commit('setLoggingIn', true);
+  async [LOGIN_USER]({commit, rootState}, routeQueries: TokenRetrievalResponse) {
+    commit(SET_LOGGING_IN, true);
     if (routeQueries.error) {
-      commit('setLoggingIn', false);
-      commit('setRetryButton');
+      commit(SET_LOGGING_IN, false);
+      commit(RETRY_BUTTON_ACTIVE);
     } else {
       try {
         const args = {
@@ -60,16 +68,16 @@ const authActions: ActionTree<AuthState, RootState> =  {
             });
           }
 
-         commit('setLoggingIn', false);
-         commit('setLoginStatus', `Success! Hello /u/${userInfo.name}`);
-         commit('setContinueButton');
-         commit('setCurrentUser', currentUser);
+         commit(SET_LOGGING_IN, false);
+         commit(SET_LOGIN_STATUS, `Success! Hello /u/${userInfo.name}`);
+         commit(CONTINUE_BUTTON_ACTIVE);
+         commit(SET_CURRENT_USER, currentUser);
         });
       } catch (e) {
         const errorMessage = e.message; // TODO: Prettify error message.
-        commit('setLoggingIn', false);
-        commit('setLoginStatus', errorMessage);
-        commit('setRetryButton');
+        commit(SET_LOGGING_IN, false);
+        commit(SET_LOGIN_STATUS, errorMessage);
+        commit(RETRY_BUTTON_ACTIVE);
       }
     }
   },
@@ -77,11 +85,11 @@ const authActions: ActionTree<AuthState, RootState> =  {
    * Checks database to make sure the store matches the database wherever possible. Can be called on
    *  its own to force an update, but automatically updates periodically.
    */
-  async pollDatabaseForChanges({dispatch}) {
-    dispatch('updateUsers');
+  async [POLL_DB_FOR_CHANGES]({dispatch}) {
+    dispatch(UPDATE_USERS);
   },
-  async updateUsers({commit}) {
-      commit('setUsersList', userCollection.find());
+  async [UPDATE_USERS]({commit}) {
+      commit(SET_USERS_LIST, userCollection.find());
   },
 };
 export default authActions;
