@@ -21,6 +21,7 @@ export const LOAD_ALL_MESSAGES = 'loadAllMessages';
 
 export const actions: ActionTree<MessagesState, RootState> = {
   async [BEGIN_PERIODIC_UPDATES]({dispatch}) {
+    console.log('Beginning periodic updates.');
     dispatch(UPDATE);
 
     setInterval(() => {
@@ -122,8 +123,11 @@ export const actions: ActionTree<MessagesState, RootState> = {
   },
   async [LOAD_ALL_MESSAGES](context, before?: string) {
     const snoo = getSnoowrap(context);
+    const currentUser = getCurrentUser(context);
 
-    const owner = await snoo.getMe().id;
+    if (!currentUser) { return; }
+
+    const owner = currentUser.id;
     const [initialInbox, initialSent] = await Promise.all([
       snoo.getInbox({ before } as any),
       snoo.getSentMessages({before}),
@@ -172,25 +176,25 @@ function mapRemoteMessageToLocal(msg: snoowrap.PrivateMessage,
   }
 
 function isPrivateMessage(msg: any): msg is snoowrap.PrivateMessage {
-    return msg instanceof RemotePrivateMessage;
-  }
+  return msg instanceof RemotePrivateMessage;
+}
 
 function saveMessages(messages: LocalMessage[]): [number, number] {
-    let successfullySaved = 0;
-    let numErrors = 0;
+  let successfullySaved = 0;
+  let numErrors = 0;
 
     // Insert each separately so we can ignore errors.
-    for (const msg of messages) {
-      try {
-        upsert(messageCollection, 'id', msg);
-        successfullySaved++;
-      } catch (error) {
-      if (!error.message.includes('Duplicate key')) { console.log(error); }
-      numErrors++;
+  for (const msg of messages) {
+    try {
+      upsert(messageCollection, 'id', msg);
+      successfullySaved++;
+    } catch (error) {
+    if (!error.message.includes('Duplicate key')) { console.log(error); }
+    numErrors++;
     }
   }
 
-    return [successfullySaved, numErrors];
+  return [successfullySaved, numErrors];
 }
 
 const conversationResolver = {
