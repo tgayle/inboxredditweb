@@ -15,7 +15,7 @@ export const mutations: MutationTree<MessagesState> = {
   setRefreshing(state, refreshing: boolean) {
     state.refreshing = refreshing;
   },
-  setMessagesLastRefreshed(state, lastRefreshed: Date) {
+  setMessagesLastRefreshed(state, lastRefreshed: number) {
     state.messagesLastRefreshed = lastRefreshed;
   },
 };

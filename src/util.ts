@@ -2,11 +2,19 @@ import { LocalMessage, LocalUser } from './types/Types';
 import faker from 'faker';
 
 export function filterToNewestMessageOfConversation(allMessages: LocalMessage[]) {
-  const seen = mapMessagesToMap(allMessages);
+  const seen = mapMessagesByFirstMessageName(allMessages);
   return [...seen.values()].reverse();
 }
 
-export function mapMessagesToMap(allMessages: LocalMessage[]) {
+/**
+ * Iterates through a list of messages and creates a map where the key is the `firstMessageName` and
+ * the value is the most recent occurance of a message with that `firstMessageName`. This means that
+ * for a list of messages, each key-value pair will represent the newest message with that
+ * `firstMessageName`.
+ *
+ * @param allMessages A list of messages to iterate on
+ */
+export function mapMessagesByFirstMessageName(allMessages: LocalMessage[]) {
   const seen = new Map<string, LocalMessage>();
   for (const msg of allMessages) {
       if (!seen.get(msg.firstMessageName)) {
