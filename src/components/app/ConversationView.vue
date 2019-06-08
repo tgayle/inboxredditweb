@@ -50,7 +50,11 @@ export default Vue.extend({
   },
   methods: {
     correspondent(conversation: LocalMessage) {
-      return this.nameFromId(conversation.owner) === conversation.author ? conversation.dest : conversation.author;
+      if (this.nameFromId(conversation.owner) === conversation.author) {
+        return conversation.dest;
+      } else {
+        return conversation.author;
+      }
     },
     parseMarkdown(str: string) {
       return snuownd.getParser().render(str);
