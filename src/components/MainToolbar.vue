@@ -75,7 +75,7 @@ export default Vue.extend({
     addAccountPressed() {
       window.location.href = this.redditAuthUrl;
     },
-    formatDate(date: Date) {
+    formatDate(date: number) {
       return moment(date).format();
     },
   },
