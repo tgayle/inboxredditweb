@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import ConversationView from '@/components/app/ConversationView.vue';
 import { LocalMessage } from '@/types/Types';
-import { testMessage, testMessageOwners, mocks, localVue } from './shared';
+import { testMessage, testMessageOwners, mocks, localVue } from '../shared';
 
 describe('ConversationView.vue', () => {
   it('correctly retrives username from id', () => {

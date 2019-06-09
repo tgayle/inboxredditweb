@@ -1,6 +1,6 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import RecentConversations from '@/components/app/RecentConversations.vue';
-import { testMessage, testMessageOwners, localVue } from './shared';
+import { testMessage, testMessageOwners, localVue } from '../shared';
 import { LocalMessage } from '@/types/Types';
 
 const propsData = {

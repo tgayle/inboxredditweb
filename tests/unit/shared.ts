@@ -1,6 +1,14 @@
-import { LocalMessage } from '@/types/Types';
+import { LocalMessage, LocalUser } from '@/types/Types';
 import { createLocalVue } from '@vue/test-utils';
 import Vuetify from 'vuetify';
+
+export const testUser: LocalUser = {
+  accessToken: 'access',
+  id: 'someid',
+  name: 'test',
+  refreshToken: 'refresh',
+  tokenExpirationDate: 0,
+};
 
 export const testMessage: LocalMessage =  {
   author: 'owner1',

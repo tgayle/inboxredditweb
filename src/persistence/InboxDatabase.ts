@@ -13,8 +13,10 @@ export const databaseReady = new Promise((resolve) => {
   dbReadyResolver = resolve;
 });
 
+const adapter = (window.indexedDB) ? new lokiIndexedAdapter('inbox') : new loki.LokiMemoryAdapter();
+
 export const db = new loki('inbox.db', {
-  adapter: new lokiIndexedAdapter('inbox'),
+  adapter,
   autoload: true,
   verbose: true,
   autosaveCallback: () => console.log('Server data saved.'),
@@ -55,6 +57,7 @@ function prepareDatabase() {
     db.addCollection<LocalUser>('users', {
       unique: ['id'],
       indices: ['name'],
+      clone: true,
     });
   }
 
@@ -63,6 +66,7 @@ function prepareDatabase() {
     db.addCollection<LocalMessage>('messages', {
       unique: ['id'],
       indices: ['id', 'owner', 'firstMessageName', 'createdUtc'],
+      clone: true,
     });
   }
 
@@ -70,6 +74,6 @@ function prepareDatabase() {
   messageCollection = db.getCollection('messages');
   console.log(userCollection.find().length, 'users in database.');
 
-  dbReadyResolver();
+  dbReadyResolver(true);
 }
 
