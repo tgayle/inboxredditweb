@@ -1,27 +1,27 @@
 <template>
   <div>
     <v-progress-linear class="ma-0 pa-0" indeterminate v-if="loadingBar"/>
-    <v-list two-line>
-      <v-list-tile
-        :key="convo.id"
-        v-for="convo in conversations"
-        :to="{name: 'viewconversation', params: {conversation: convo.firstMessageName, where: $route.params.where}}"
-        @click="$emit('conversation-click', convo.firstMessageName, $event)">
-          <v-list-tile-content>
-            <v-list-tile-title>
-              <div class="recentconversation--grid">
-                  <p class="recentconversation--subject recentconversation--grid--subject">{{convo.subject}}</p>
-                <div class="recentconversation--grid--sentreceived">
-                  <v-icon class="">{{wasMe(convo) ? 'call_made' : 'call_received'}}</v-icon> 
-                </div>
-              </div>
-            </v-list-tile-title>
-            <v-list-tile-sub-title>
-              <span class='text--primary'>/u/{{correspondent(convo)}}</span> &mdash; {{convo.body}}
-            </v-list-tile-sub-title>
-          </v-list-tile-content>
-      </v-list-tile>
-    </v-list>
+    <v-card
+      class="pa-2"
+      :key="convo.id"
+      v-for="convo in conversations"
+      :to="{name: 'viewconversation', params: {conversation: convo.firstMessageName, where: $route.params.where}}"
+      @click="$emit('conversation-click', convo.firstMessageName, $event)">
+
+      <div class="recentconversation--grid">
+        <p class="recentconversation--grid--correspondent ma-0 oneline" :class="unreadConversationStyles(convo)">/u/{{correspondent(convo)}}</p>
+        <p class="recentconversation--subject recentconversation--grid--subject ma-0 oneline" :class="unreadConversationStyles(convo)">{{convo.subject}}</p>
+
+        <p class="recentconversation--grid--time ma-0">{{timeAgo(convo.createdUtc)}}</p>
+
+        <div class="recentconversation--grid--sentreceived">
+          <v-icon :style="unreadSentReceivedIconStyle(convo)">{{wasMe(convo) ? 'call_made' : 'call_received'}}</v-icon> 
+        </div>
+
+        <p class="recentconversation--grid--preview ma-0 pt-0 oneline">{{convo.body}}</p>
+      </div>
+
+    </v-card>
   </div>
 </template>
 
@@ -29,6 +29,8 @@
 import Vue from 'vue';
 import { LocalMessage } from '../../types/Types';
 import { mapGetters } from 'vuex';
+import moment from 'moment';
+
 export default Vue.extend({
   props: {
     loadingBar: {
@@ -44,6 +46,25 @@ export default Vue.extend({
     },
     correspondent(conversation: LocalMessage) {
       return this.nameFromId(conversation.owner) === conversation.author ? conversation.dest : conversation.author;
+    },
+    timeAgo(time: number) {
+      return moment(time).fromNow();
+    },
+    unreadConversationStyles(conversation: LocalMessage) {
+      if (conversation.isNew) {
+        return {
+          'font-weight-bold': true,
+        };
+      }
+      return {};
+    },
+    unreadSentReceivedIconStyle(conversation: LocalMessage) {
+      if (conversation.isNew) {
+        return {
+          color: this.$vuetify.theme.accent,
+        };
+      }
+      return {};
     },
   },
   computed: {
@@ -62,22 +83,49 @@ export default Vue.extend({
 
   &--grid {
     display: grid;
-    grid-template-columns: [main] 9fr [meta] 1fr;
-    grid-template-rows: [subject] 1fr;
+    grid-template-columns: [main] 6fr [meta] 4fr;
+    grid-template-rows: [correspondent] 1fr [subject] 1fr [preview] 1fr;
 
     &--subject {
-      grid-column-start: main;
+      grid-column: main;
       grid-row-start: subject;
       text-overflow: ellipsis;
       overflow: hidden;
     }
 
+    &--time {
+      grid-column: meta;
+      grid-row: correspondent;
+      justify-self: end;
+      max-lines: 1;
+    }
+
     &--sentreceived {
       grid-column-start: meta;
       grid-row-start: subject;
+      justify-self: end;
+    }
+
+    &--preview {
+      grid-column-start: main;
+      grid-column-end: span 2;
+      grid-row-start: preview;
+      opacity: 0.83;
+    }
+
+    &--correspondent {
+      grid-column-start: main;
+      grid-row: correspondent;
     }
   }
+
+  
 }
 
-
+.oneline {
+    max-lines: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 </style>

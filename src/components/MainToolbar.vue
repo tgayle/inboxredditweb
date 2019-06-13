@@ -26,7 +26,6 @@
     <v-menu bottom left offset-y v-if="currentUser">
       <template v-slot:activator="{ on }">
         <v-btn
-          dark
           flat
           v-on="on"
           class="text-none"
