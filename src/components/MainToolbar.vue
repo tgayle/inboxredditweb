@@ -11,6 +11,8 @@
     <v-spacer></v-spacer>
 
     <v-toolbar-items v-if="currentUser">
+      <v-btn flat @click="switchTheme">Enable {{darkModeText}} Mode</v-btn>
+
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
           <v-btn flat v-on="on" @click="$store.dispatch('app/messages/refreshMessages')">
@@ -57,13 +59,21 @@ import { LocalUser } from '../types/Types';
 
 import moment from 'moment';
 export default Vue.extend({
+  data() {
+    return {
+      darkModeText: 'Dark',
+    };
+  },
   computed: {
     ...mapState('auth', ['users', 'currentUser', 'redditAuthUrl']),
     ...mapState('app/messages', ['messagesLastRefreshed', 'refreshing']),
+    ...mapState('app', ['darkModeEnabled']),
     ...mapGetters('app/messages', ['messagesLastRefreshedPretty']),
   },
   watch: {
-
+    darkModeEnabled(newValue: boolean, oldValue: boolean) {
+      this.darkModeText = this.darkModeEnabled ? 'Light' : 'Dark';
+    },
   },
   methods: {
     userClicked(user: LocalUser) {
@@ -75,6 +85,9 @@ export default Vue.extend({
     },
     formatDate(date: number) {
       return moment(date).format();
+    },
+    switchTheme() {
+      this.$store.dispatch('app/changeAppTheme', !this.darkModeEnabled);
     },
   },
 });

@@ -28,8 +28,12 @@
             </li>
           </ul>
 
-          <v-card-text>
+          <v-card-text v-if="!currentUser">
             To get started, <a :href="redditAuthUrl">sign in with Reddit.</a>
+          </v-card-text>
+
+          <v-card-text v-else>
+            You're already logged in. <router-link :to="{name: 'app'}">Go to Inbox</router-link>
           </v-card-text>
           
         </v-responsive>
@@ -43,7 +47,7 @@ import Vue from 'vue';
 import { mapState } from 'vuex';
 export default Vue.extend({
   computed: {
-    ...mapState('auth', ['redditAuthUrl']),
+    ...mapState('auth', ['redditAuthUrl', 'currentUser']),
   },
 });
 </script>
