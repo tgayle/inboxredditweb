@@ -15,7 +15,7 @@
         <p class="recentconversation--grid--time ma-0">{{timeAgo(convo.createdUtc)}}</p>
 
         <div class="recentconversation--grid--sentreceived">
-          <v-icon :style="unreadSentReceivedIconStyle(convo)">{{wasMe(convo) ? 'call_made' : 'call_received'}}</v-icon> 
+          <v-icon class="recentconversation--grid--sentreceivedicon" :style="unreadSentReceivedIconStyle(convo)">{{wasMe(convo) ? 'call_made' : 'call_received'}}</v-icon> 
         </div>
 
         <p class="recentconversation--grid--preview ma-0 pt-0 oneline">{{convo.body}}</p>

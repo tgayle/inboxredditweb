@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import RecentConversations from '@/components/app/RecentConversations.vue';
 import { testMessage, testMessageOwners, localVue } from '../shared';
 import { LocalMessage } from '@/types/Types';
@@ -16,7 +16,11 @@ const mocks = {
   },
 };
 
-
+const computed = {
+  nameFromId: () => (id: string) => {
+    return testMessageOwners[id];
+  },
+};
 
 describe('RecentConversations.vue', () => {
   it('shows the loading bar when prop is true', () => {
@@ -24,11 +28,7 @@ describe('RecentConversations.vue', () => {
       propsData: { ...propsData, loadingBar: true },
       mocks,
       localVue,
-      computed: {
-        nameFromId: () => (id: string) => {
-          return testMessageOwners[id];
-        },
-      },
+      computed,
     });
 
     expect(wrapper.props().loadingBar).toBeTruthy();
@@ -40,11 +40,7 @@ describe('RecentConversations.vue', () => {
       propsData,
       mocks,
       localVue,
-      computed: {
-        nameFromId: () => (id: string) => {
-          return testMessageOwners[id];
-        },
-      },
+      computed,
     });
 
     expect(wrapper.find({name: 'v-progress-linear'}).exists()).toBeFalsy();
@@ -61,14 +57,10 @@ describe('RecentConversations.vue', () => {
       propsData: { conversations: [modifiedMessage] },
       mocks,
       localVue,
-      computed: {
-        nameFromId: () => (id: string) => {
-          return testMessageOwners[id];
-        },
-      },
+      computed,
     });
 
-    const correspondentText = wrapper.find('span.text--primary').text();
+    const correspondentText = wrapper.find('p.recentconversation--grid--correspondent').text();
     expect(correspondentText).toMatch('/u/evan');
   });
 
@@ -77,14 +69,60 @@ describe('RecentConversations.vue', () => {
       propsData: { conversations: [testMessage] },
       mocks,
       localVue,
-      computed: {
-        nameFromId: () => (id: string) => {
-          return testMessageOwners[id];
-        },
-      },
+      computed,
     });
 
-    const correspondentText = wrapper.find('.text--primary').text();
+    const correspondentText = wrapper.find('p.recentconversation--grid--correspondent').text();
     expect(correspondentText).toMatch('/u/evan');
+  });
+
+  it('changes sent-received icon direction when last message was received', () => {
+    const wrapper = shallowMount(RecentConversations, {
+      propsData: { conversations: [{
+        ...testMessage,
+        author: 'someotherauthor',
+      }],
+      },
+      mocks,
+      localVue,
+      computed,
+    });
+
+    const icon = wrapper.find('.recentconversation--grid--sentreceivedicon');
+    expect(icon.text()).toMatch('call_received');
+  });
+
+  it('changes sent-received icon direction when last message was sent', () => {
+    const wrapper = shallowMount(RecentConversations, {
+      propsData: { conversations: [{
+        ...testMessage,
+      }],
+      },
+      mocks,
+      localVue,
+      computed,
+    });
+
+    const icon = wrapper.find('.recentconversation--grid--sentreceivedicon');
+    expect(icon.text()).toMatch('call_made');
+  });
+
+  it('boldens correspondent and subject lines when message is unread', () => {
+    const wrapper = shallowMount(RecentConversations, {
+      propsData: { conversations: [{
+        ...testMessage,
+        isNew: true,
+      }],
+      },
+      mocks,
+      localVue,
+      computed,
+    });
+
+    const correspondentText = wrapper.find('p.recentconversation--grid--correspondent');
+    const subjectText = wrapper.find('p.recentconversation--subject');
+
+    expect(correspondentText.classes('font-weight-bold')).toBe(true);
+    expect(subjectText.classes('font-weight-bold')).toBe(true);
   });
 });
