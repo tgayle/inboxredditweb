@@ -15,7 +15,7 @@
       </v-flex>
       <v-divider vertical/>
 
-      <v-flex>
+      <v-flex xs7 lg9>
         <no-conversation v-if="!$route.params.conversation"/>
         <conversation-view 
           v-else 

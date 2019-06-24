@@ -3,7 +3,13 @@ import { AuthState, clientId, userAgent } from './state';
 import { RootState } from '@/store';
 import snoowrap from 'snoowrap';
 
-const authGetters: GetterTree<AuthState, RootState> = {
+// Added for better type inference.
+interface AuthGetters {
+  snoowrap(state: AuthState): snoowrap | undefined;
+  nameFromId(state: AuthState): (id: string) => string;
+}
+
+const authGetters: GetterTree<AuthState, RootState> & AuthGetters = {
   snoowrap(state) {
     if (state.currentUser) {
       const snoo = new snoowrap({
@@ -24,8 +30,8 @@ const authGetters: GetterTree<AuthState, RootState> = {
     }
     return undefined;
   },
-  nameFromId: (state) => (id: string) => {
-    return state.users.filter((user) => user.id === id)[0];
+  nameFromId(state) {
+    return (id: string) => state.users.filter((user) => user.id === id)[0].name;
   },
 };
 
